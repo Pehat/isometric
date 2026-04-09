@@ -948,39 +948,23 @@ function(EffectLoader, Emitter, utils) {
           }
         }
         else {
-          if (direction === "up") {
-            drawY += distance * curZoom;
+          var _delta = {
+            "up":    {"x":  0, "y":  1},
+            "down":  {"x":  0, "y": -1},
+            "left":  {"x":  1, "y":  0},
+            "right": {"x": -1, "y":  0}
+          }[direction];
+          if (_delta) {
+            var _scaled_delta = {
+              "x": delta.x * distance * curZoom,
+              "y": delta.y * distance * curZoom
+            };
+            drawX += _scaled_delta.x;
+            drawY += _scaled_delta.y;
             // Offset moving for particle effect particles
             for (particle in particleMapHolder) {
               for (subPart in particleMapHolder[particle]) {
-                particleMapHolder[particle][subPart].ShiftBy(0, distance * curZoom);
-              }
-            }
-          }
-          else if (direction === "down") {
-            drawY -= distance * curZoom;
-            // Offset moving for particle effect particles
-            for (particle in particleMapHolder) {
-              for (subPart in particleMapHolder[particle]) {
-                particleMapHolder[particle][subPart].ShiftBy(0, -distance * curZoom);
-              }
-            }
-          }
-          else if (direction === "left") {
-            drawX += distance * curZoom;
-            // Offset moving for particle effect particles
-            for (particle in particleMapHolder) {
-              for (subPart in particleMapHolder[particle]) {
-                particleMapHolder[particle][subPart].ShiftBy(distance * curZoom, 0);
-              }
-            }
-          }
-          else if (direction === "right") {
-            drawX -= distance * curZoom;
-            // Offset moving for particle effect particles
-            for (particle in particleMapHolder) {
-              for (subPart in particleMapHolder[particle]) {
-                particleMapHolder[particle][subPart].ShiftBy(-distance * curZoom, 0);
+                particleMapHolder[particle][subPart].ShiftBy(_scaled_delta.x, _scaled_delta.y);
               }
             }
           }
