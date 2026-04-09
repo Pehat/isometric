@@ -929,45 +929,39 @@ function(EffectLoader, Emitter, utils) {
         var particle, subPart;
 
         distance = distance || tileHeight;
-        if (isometric) {
-          if (direction === "up") {
-            drawY += distance / 2 * curZoom;
-            drawX += distance * curZoom;
-          }
-          else if (direction === "down") {
-            drawY += distance / 2 * curZoom;
-            drawX -= distance * curZoom;
-          }
-          else if (direction === "left") {
-            drawY -= distance / 2 * curZoom;
-            drawX -= distance * curZoom;
-          }
-          else if (direction === "right") {
-            drawY -= distance / 2 * curZoom;
-            drawX += distance * curZoom;
-          }
-        }
-        else {
-          var _delta = {
+        var scaled_step = distance * curZoom;
+        
+        var _delta = {
+          false: {
             "up":    {"x":  0, "y":  1},
             "down":  {"x":  0, "y": -1},
             "left":  {"x":  1, "y":  0},
             "right": {"x": -1, "y":  0}
-          }[direction];
-          if (_delta) {
-            var _scaled_delta = {
-              "x": delta.x * distance * curZoom,
-              "y": delta.y * distance * curZoom
-            };
-            drawX += _scaled_delta.x;
-            drawY += _scaled_delta.y;
-            // Offset moving for particle effect particles
-            for (particle in particleMapHolder) {
-              for (subPart in particleMapHolder[particle]) {
-                particleMapHolder[particle][subPart].ShiftBy(_scaled_delta.x, _scaled_delta.y);
-              }
-            }
+          },
+          true: {
+            "up":    {"x":  1, "y":  0.5},
+            "down":  {"x": -1, "y":  0.5},
+            "left":  {"x": -1, "y": -0.5},
+            "right": {"x":  1, "y": -0.5}
           }
+        }[!!isometric][direction];  
+
+        if !(_delta) return;
+    
+        var _scaled_delta = {
+          "x": _delta.x * scaled_step,
+          "y": _delta.y * scaled_step
+        };
+        drawX += _scaled_delta.x;
+        drawY += _scaled_delta.y;
+        
+        if (!isometric) {
+          // Offset moving for particle effect particles
+          for (particle in particleMapHolder) {
+            for (subPart in particleMapHolder[particle]) {
+              particleMapHolder[particle][subPart].ShiftBy(_scaled_delta.x, _scaled_delta.y);
+            }
+          }          
         }
       }
     };
